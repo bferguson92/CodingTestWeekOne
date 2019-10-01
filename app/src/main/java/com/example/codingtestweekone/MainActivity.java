@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
         };
 
         boolean vTrue = isOutbreak(verticalTrue);
-
-        Log.d("ROOM", String.valueOf(vTrue));
+        final TextView display = findViewById(R.id.tvDisplay);
+        display.setText(String.valueOf(vTrue));
+        Log.d("INF", String.valueOf(vTrue));
     }
 
     public int mostOccurrences(int[] values){
@@ -79,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < numStr.length(); i++){
             armStrongNums[i] = Character.getNumericValue(numStr.charAt(i));
             armNum += Math.pow(armStrongNums[i], 3);
-            Log.d("ARMSTR", Integer.toString(armNum));
         }
 
         if(armNum == num){
@@ -89,7 +90,40 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public static boolean isOutbreak(Room[][] floor){
+    public boolean isOutbreak(Room[][] floor){
+        int rows = floor.length;
+        int cols = floor[0].length;
+        boolean result = false;
+
+        for(int i = 0; i < rows; i++){
+            for (int j = 0; j < cols; j++){
+                if(searchRooms(floor, rows, cols, 0)){
+                    result = true;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public boolean searchRooms(Room[][] floor, int row, int col, int i){
+        int j = floor.length;
+        int k = floor[0].length;
+
+        if(row < 0 || col < 0 || row >= j || col >= k){
+            return false;
+        }
+
+        if(floor[row][col].isInfected && floor[row][col+1].isInfected) {
+            boolean temp = floor[row][col].isInfected;
+            if(i == floor.length - 1){
+                return true;
+            } else if(searchRooms(floor, row--, col, i++) || searchRooms(floor, row++, col, i++) ||
+                    searchRooms(floor, row, col--, i++) || searchRooms(floor, row, col++, i++)){
+                return true;
+            }
+        }
+
         return false;
     }
 }
